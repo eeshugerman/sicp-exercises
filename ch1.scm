@@ -67,15 +67,51 @@
 
 ;;; 1.5 ;;;
 ;; applicative-order:
-;;   the arguments `0` and `(p)` will be evaluated before
-;;   the body of the procedure is interpreted. the program
+;;   The arguments `0` and `(p)` will be evaluated before
+;;   the body of the procedure is interpreted. The program
 ;;   will hang indefinitely when evaluating `(p)` because it
 ;;   simply evaluates to itself resulting in infinite
 ;;   recursion.
 ;;
 ;; normal-order:
-;;   the arguments will not be evaluated until final
-;;   expression for the body is assembled. the `if` condition
+;;   The arguments will not be evaluated until final
+;;   expression for the body is assembled. The `if` condition
 ;;   is true, so the final expression is simply 0; `(p)` is
 ;;   never evaluated and the program exits normally.
 
+
+;;; 1.6 ;;;
+(define (square x) (* x x))
+
+(define (good-enough? guess x)
+  (< (abs (- x (square guess))) .0001))
+
+(define (improve guess x)
+  (/ (+ guess (/ x guess)) 2))
+
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x) x)))
+
+(define (new-sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (new-sqrt-iter (improve guess x) x)))
+
+(define (sqrt x)
+  (sqrt-iter 1 x))
+
+(define (new-sqrt x)
+  (new-sqrt-iter 1 x))
+
+;; new-sqrt hangs and then gives a memory error. This is
+;; because new-if is a function, so it's arguments are
+;; evaluated when it is called. The else-clause argument
+;; is the result of the previous iteration, and is evaluated
+;; even when the predicate good-enough? is true, so the
+;; recursion never terminates.
