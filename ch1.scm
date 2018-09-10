@@ -115,3 +115,42 @@
 ;; is the result of the previous iteration, and is evaluated
 ;; even when the predicate good-enough? is true, so the
 ;; recursion never terminates.
+
+;;; 1.7 ;;;
+;; For small numbers, the arbitrary value of  .0001 is
+;; is too large to give an accurate result. For large
+;; numbers, the inaccuracy due to limited precision
+;; may exceed .0001, so the program will not reliably
+;; converge.
+
+
+#;281> (sqrt-iter 1e-3 1e-4)
+0.001
+#;286> (square .001)
+1e-06
+
+1e+200
+#;594> (sqrt-iter 1e90 1e+200)
+1e+100
+#;600> (square 1e100) ; hmm, this seems to work fine
+
+(define (good-enough2? guess last-guess x)
+  (<
+   (/ (abs (- guess last-guess))
+      x)
+  .0001))
+
+(define (sqrt-iter2 guess last-guess x)
+  (if (good-enough2? guess last-guess x)
+      guess
+      (sqrt-iter2 (improve guess x) guess x)))
+
+(define (sqrt2 x)
+  (sqrt-iter2 1 (abs (- 1 x)) x))
+
+
+#;990>(square (sqrt2 1e-8))
+1e-08
+
+#;1009> (/ (square (sqrt2 1e8)) 1e8)
+1.16307483937468
