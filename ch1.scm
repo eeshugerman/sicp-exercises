@@ -154,3 +154,24 @@
 
 #;1009> (/ (square (sqrt2 1e8)) 1e8)
 1.16307483937468
+
+
+;;; 1.8 ;;;
+(define (cbrt-improve guess x)
+  (/ (+ (/ x (square guess))
+        (* 2 guess))
+     3))
+
+(define (cbrt-iter guess last-guess x)
+  (if (good-enough2? guess last-guess x)
+      guess
+      (cbrt-iter (cbrt-improve guess x) guess x)))
+
+(define (cbrt x)
+  (cbrt-iter 1 (abs (- 1 x)) x))
+
+(define (cube x)
+  (* x x x))
+
+#;1248> (cube (cbrt 5))
+5.00000003601359
