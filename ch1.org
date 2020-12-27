@@ -102,7 +102,9 @@
 
 * excercise 1.3
 #+begin_src scheme :session :results silent
-  (define (sum-of-squares a b) (+ (* a a) (* b b)))
+  (define (sum-of-squares a b)
+    (+ (* a a) (* b b)))
+
   (define (f a b c)
     (cond ((= (min a b c) a) (sum-of-squares b c))
           ((= (min a b c) b) (sum-of-squares a c))
@@ -110,7 +112,7 @@
 #+end_src
 
 * excercise 1.4
-#+begin_src python 
+#+begin_src python :eval never
   if b > 0:
       return a + b
   else:
@@ -121,19 +123,16 @@
 
 * excercise 1.5
 ** applicative-order
-   The arguments ~0~ and ~(p)~ will be evaluated before
-   the body of the procedure is interpreted. The program
-   will hang indefinitely when evaluating ~(p)~ because it
-   simply evaluates to itself resulting in infinite
-   recursion.
+   The arguments ~0~ and ~(p)~ will be evaluated before the body of the
+   procedure is interpreted. The program will hang indefinitely when evaluating
+   ~(p)~ because it simply evaluates to itself resulting in infinite recursion.
   
 ** normal-order
-   The arguments will not be evaluated until final
-   expression for the body is assembled. The ~if~ condition
-   is true, so the final expression is simply 0; ~(p)~ is
-   never evaluated and the program exits normally.
+   The arguments will not be evaluated until final expression for the body is
+   assembled. The ~if~ condition is true, so the final expression is simply 0;
+   ~(p)~ is never evaluated and the program exits normally.
 
-* excercise 1.6 
+* excercise 1.6
 #+begin_src scheme :session :results silent
   (define (square x) (* x x))
 
@@ -158,85 +157,86 @@
             (new-sqrt-iter (improve guess x) x)))
 
   (define (sqrt x)
-    (sqrt-iter 1 x))
+    (sqrt-iter 1.0 x))
 
   (define (new-sqrt x)
-    (new-sqrt-iter 1 x))
+    (new-sqrt-iter 1.0 x))
 #+end_src
 
-~new-sqrt~ hangs and then gives a memory error. This is
-because ~new-if~ is a function, so it's arguments are
-evaluated when it is called. The else-clause argument
-is the result of the previous iteration, and is evaluated
-even when the predicate good-enough? is true, so the
+~new-sqrt~ hangs and then gives a memory error. This is because ~new-if~ is a
+function, so it's arguments are evaluated when it is called. The else-clause
+argument is evaluated even when the predicate ~good-enough?~ is true, so the
 recursion never terminates.
 
 * excercise 1.7
-For small numbers, the arbitrary value of  .0001 is
-is too large to give an accurate result. For large
-numbers, the inaccuracy due to limited precision
-may exceed .0001, so the program will not reliably
-converge.
+For small numbers, the arbitrary value of .0001 is is too large to give an
+accurate result. For large numbers, the inaccuracy due to limited precision may
+exceed .0001, so the program will not reliably converge.
+** examples
+*** inaccurate for small numbers:
+   #+begin_src scheme :session
+     (square (sqrt 1e-4))
+   #+end_src
 
-#+begin_src scheme :session
-  (sqrt-iter 1e-3 1e-4)
-#+end_src
+   #+RESULTS:
+   : 0.00013631669067247127
 
-#+RESULTS:
-: 0.001
+*** hangs for big numbers
+   #+begin_src scheme :session :eval never
+     (sqrt 1e50)
+   #+end_src
 
-#+begin_src scheme :session
-  (square .001)
-#+end_src
+** improved implementation
+   #+begin_src scheme :session :results silent
+     (define (good-enough2? guess last-guess x)
+       (if (eq? last-guess '())
+           #f
+           (let ((diff (abs (- guess last-guess))))
+             (< (/ diff x) .0001))))
 
-#+RESULTS:
-: 1e-06
+     (define (sqrt-iter2 guess last-guess x)
+       (if (good-enough2? guess last-guess x)
+           guess
+           (sqrt-iter2 (improve guess x) guess x)))
 
+     (define (sqrt2 x)
+       (sqrt-iter2 1.0 '() x))
+   #+end_src
+*** let's try it out...
+**** medium numbers
+     it works!
+     #+begin_src scheme :session
+       (sqrt2 9)
+     #+end_src
 
-#+begin_src scheme :session
-  (sqrt-iter 1e90 1e+200)
-#+end_src
+     #+RESULTS:
+     : 3.000000001396984
 
-#+RESULTS:
-: 1e+100
+     #+begin_src scheme :session
+       (sqrt2 100)
+     #+end_src
 
-#+begin_src scheme :session
-  (square 1e100) ; hmm, this seems to work fine
-#+end_src
+     #+RESULTS:
+     : 10.000000000139897
+ 
+**** small numbers
+     accuracy issues addressed!
+     #+begin_src scheme :session
+       ;; (square (sqrt2 0.00001))
+       (square (sqrt2 0.00001))
+     #+end_src
 
-#+RESULTS:
-: 1e+200
+     #+RESULTS:
+     : 1e-05
 
-#+begin_src scheme :session :results silent
-  (define (good-enough2? guess last-guess x)
-    (<
-     (/ (abs (- guess last-guess))
-        x)
-    .0001))
+**** big numbers
+     no longer hangs!
+     #+begin_src scheme :session
+       (square (sqrt2 1e6))
+     #+end_src
 
-  (define (sqrt-iter2 guess last-guess x)
-    (if (good-enough2? guess last-guess x)
-        guess
-        (sqrt-iter2 (improve guess x) guess x)))
-
-  (define (sqrt2 x)
-    (sqrt-iter2 1 (abs (- 1 x)) x))
-#+end_src
-
-
-#+begin_src scheme :session
-  (square (sqrt2 1e-8))
-#+end_src
-
-#+RESULTS:
-: 9.999999999999999e-09
-
-#+begin_src scheme :session
-  (/ (square (sqrt2 1e8)) 1e8)
-#+end_src
-
-#+RESULTS:
-: 1.163074839374683
+     #+RESULTS:
+     : 1001108.0488810338
 
 * excercise 1.8
 #+begin_src scheme :session :results silent
@@ -251,17 +251,15 @@ converge.
         (cbrt-iter (cbrt-improve guess x) guess x)))
 
   (define (cbrt x)
-    (cbrt-iter 1 (abs (- 1 x)) x))
+    (cbrt-iter 1.0 '() x))
 
   (define (cube x)
     (* x x x))
 #+end_src
 
 #+begin_src scheme :session
-  (cube (cbrt 5))
+  (cube (cbrt 9))
 #+end_src
 
 #+RESULTS:
-: 53424961068499785232576730484961888082506441264081851503057731933303288827851761255767560550203451372890378266524748011611193001843352745768025987441718315878847487893761779907830641757763683666556537662274384600883109109468480576511493974161327404241543/10684992136738961827682364144582307949972355443707634615914444004841996229362015242332163381568578969877161798877711900676929439028427030837298423552681177010183183855403827672701863703617582204591686036568939901062261862271736636671516863362766031792667
-
-uhmmm yikes
+: 9.00000000242235
