@@ -1,0 +1,3 @@
+[submodule "sicp-info"]
+	path = sicp-info
+	url = https://github.com/webframp/sicp-info
