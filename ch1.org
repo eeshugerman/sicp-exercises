@@ -123,14 +123,14 @@
 
 * excercise 1.5
 ** applicative-order
-   The arguments ~0~ and ~(p)~ will be evaluated before the body of the
-   procedure is interpreted. The program will hang indefinitely when evaluating
-   ~(p)~ because it simply evaluates to itself resulting in infinite recursion.
+The arguments ~0~ and ~(p)~ will be evaluated before the body of the
+procedure is interpreted. The program will hang indefinitely when evaluating
+~(p)~ because it simply evaluates to itself resulting in infinite recursion.
   
 ** normal-order
-   The arguments will not be evaluated until final expression for the body is
-   assembled. The ~if~ condition is true, so the final expression is simply 0;
-   ~(p)~ is never evaluated and the program exits normally.
+The arguments will not be evaluated until final expression for the body is
+assembled. The ~if~ condition is true, so the final expression is simply 0;
+~(p)~ is never evaluated and the program exits normally.
 
 * excercise 1.6
 #+begin_src scheme :session :results silent
@@ -174,69 +174,69 @@ accurate result. For large numbers, the inaccuracy due to limited precision may
 exceed .0001, so the program will not reliably converge.
 ** examples
 *** inaccurate for small numbers:
-   #+begin_src scheme :session
-     (square (sqrt 1e-4))
-   #+end_src
+#+begin_src scheme :session
+  (square (sqrt 1e-4))
+#+end_src
 
-   #+RESULTS:
-   : 0.00013631669067247127
+#+RESULTS:
+: 0.00013631669067247127
 
 *** hangs for big numbers
-   #+begin_src scheme :session :eval never
-     (sqrt 1e50)
-   #+end_src
+#+begin_src scheme :session :eval never
+  (sqrt 1e50)
+#+end_src
 
 ** improved implementation
-   #+begin_src scheme :session :results silent
-     (define (good-enough2? guess last-guess x)
-       (if (eq? last-guess '())
-           #f
-           (let ((diff (abs (- guess last-guess))))
-             (< (/ diff x) .0001))))
+#+begin_src scheme :session :results silent
+  (define (good-enough2? guess last-guess x)
+    (if (eq? last-guess '())
+        #f
+        (let ((diff (abs (- guess last-guess))))
+          (< (/ diff x) .0001))))
 
-     (define (sqrt-iter2 guess last-guess x)
-       (if (good-enough2? guess last-guess x)
-           guess
-           (sqrt-iter2 (improve guess x) guess x)))
+  (define (sqrt-iter2 guess last-guess x)
+    (if (good-enough2? guess last-guess x)
+        guess
+        (sqrt-iter2 (improve guess x) guess x)))
 
-     (define (sqrt2 x)
-       (sqrt-iter2 1.0 '() x))
-   #+end_src
+  (define (sqrt2 x)
+    (sqrt-iter2 1.0 '() x))
+#+end_src
 *** let's try it out...
 **** medium numbers
-     it works!
-     #+begin_src scheme :session
-       (sqrt2 9)
-     #+end_src
+it works!
+#+begin_src scheme :session
+  (sqrt2 9)
+#+end_src
 
-     #+RESULTS:
-     : 3.000000001396984
+#+RESULTS:
+: 3.000000001396984
 
-     #+begin_src scheme :session
-       (sqrt2 100)
-     #+end_src
+#+begin_src scheme :session
+  (sqrt2 100)
+#+end_src
 
-     #+RESULTS:
-     : 10.000000000139897
+#+RESULTS:
+: 10.000000000139897
  
 **** small numbers
-     accuracy issues addressed!
-     #+begin_src scheme :session
-       ;; (square (sqrt2 0.00001))
-       (square (sqrt2 0.00001))
-     #+end_src
+accuracy issues addressed!
+#+begin_src scheme :session
+  ;; (square (sqrt2 0.00001))
+  (square (sqrt2 0.00001))
+#+end_src
 
-     #+RESULTS:
-     : 1e-05
+#+RESULTS:
+: 1e-05
 
 **** big numbers
-     no longer hangs!
-     #+begin_src scheme :session
-       (square (sqrt2 1e6))
-     #+end_src
+no longer hangs!
+#+begin_src scheme :session
+  (square (sqrt2 1e6))
+#+end_src
 
-     #+RESULTS:
-     : 1001108.0488810338
+#+RESULTS:
+: 1001108.0488810338
 
 * excercise 1.8
 #+begin_src scheme :session :results silent
@@ -266,81 +266,84 @@ exceed .0001, so the program will not reliably converge.
 
 * excercise 1.9
 ** v1
-   #+begin_src scheme :eval never
-     (+ 4 5)
-     (inc (+ 3 5))
-     (inc (inc (+ 2 5))) 
-     (inc (inc (inc (+ 1 5))))
-     (inc (inc (inc (inc (+ 0 5)))))
-     (inc (inc (inc (inc 5))))
-     (inc (inc (inc 6)))
-     (inc (inc 7))
-     (inc 8)
-     9
-   #+end_src
-   this is a recursive process
+#+begin_src scheme :eval never
+  (+ 4 5)
+  (inc (+ 3 5))
+  (inc (inc (+ 2 5))) 
+  (inc (inc (inc (+ 1 5))))
+  (inc (inc (inc (inc (+ 0 5)))))
+  (inc (inc (inc (inc 5))))
+  (inc (inc (inc 6)))
+  (inc (inc 7))
+  (inc 8)
+  9
+#+end_src
+this is a recursive process
 ** v2
-   #+begin_src scheme
-     (+ 4 5)
-     (+ 3 6)
-     (+ 2 7)
-     (+ 1 8)
-     (+ 0 9)
-     9
-   #+end_src
-   this is an iterative process
+#+begin_src scheme
+  (+ 4 5)
+  (+ 3 6)
+  (+ 2 7)
+  (+ 1 8)
+  (+ 0 9)
+  9
+#+end_src
+this is an iterative process
 
 * excercise 1.10
-** (A 1 10)
-   #+begin_src scheme :eval never
-     (A 1 10)
-     (A 0 (A 1 9))
-     (A 0 (A 0 (A 1 8)))
-     (A 0 (A 0 (A 0 (A 1 7))))
-     (A 0 (A 0 (A 0 (A 0 (A 1 6)))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 5))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 4)))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 3))))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 2)))))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 1))))))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 2)))))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 4))))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 8)))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 16))))))
-     (A 0 (A 0 (A 0 (A 0 (A 0 32)))))
-     (A 0 (A 0 (A 0 (A 0 64))))
-     (A 0 (A 0 (A 0 128)))
-     (A 0 (A 0 256))
-     (A 0 512)
-     1024  ;; 2^10
-   #+end_src
-** (A 2 4)
-   #+begin_src scheme :eval never
-     (A 2 4)
-     (A 1 (A 2 3))
-     (A 1 (A 1 (A 2 2)))
-     (A 1 (A 1 (A 1 (A 2 1))))
-     (A 1 (A 1 (A 1 2)))
-     (A 1 (A 1 4))  ;; (A 1 x) -> 2^x
-     (A 1 16)
-     65536  ;; 2^16  
-   #+end_src
-** (A 3 3) 
-   #+begin_src scheme
-     (A 3 3)
-     (A 2 (A 3 2))
-     (A 2 (A 2 (A 3 1)))
-     (A 2 (A 2 2))
-     (A 2 (A 1 (A 2 1)))
-     (A 2 (A 1 2))
-     (A 2 4)
-     65536  ;; 2^16  
-   #+end_src
+** what are the values... ?
+*** (A 1 10)
+#+begin_src scheme :eval never
+  (A 1 10)
+  (A 0 (A 1 9))
+  (A 0 (A 0 (A 1 8)))
+  (A 0 (A 0 (A 0 (A 1 7))))
+  (A 0 (A 0 (A 0 (A 0 (A 1 6)))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 5))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 4)))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 3))))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 2)))))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 1 1))))))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 2)))))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 4))))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 8)))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 (A 0 16))))))
+  (A 0 (A 0 (A 0 (A 0 (A 0 32)))))
+  (A 0 (A 0 (A 0 (A 0 64))))
+  (A 0 (A 0 (A 0 128)))
+  (A 0 (A 0 256))
+  (A 0 512)
+  1024  ;; 2^10
+#+end_src
+*** (A 2 4)
+#+begin_src scheme :eval never
+  (A 2 4)
+  (A 1 (A 2 3))
+  (A 1 (A 1 (A 2 2)))
+  (A 1 (A 1 (A 1 (A 2 1))))
+  (A 1 (A 1 (A 1 2)))
+  (A 1 (A 1 4))  ;; (A 1 x) -> 2^x
+  (A 1 16)
+  65536  ;; 2^16  
+#+end_src
+*** (A 3 3) 
+#+begin_src scheme
+  (A 3 3)
+  (A 2 (A 3 2))
+  (A 2 (A 2 (A 3 1)))
+  (A 2 (A 2 2))
+  (A 2 (A 1 (A 2 1)))
+  (A 2 (A 1 2))
+  (A 2 4)
+  65536  ;; 2^16  
+#+end_src
 
-  | proc | expression         |
-  |------+--------------------|
-  | f    | 2n                 |
-  | g    | 2^n                |
-  | h    | 2^2...^2 (n times) |
+** give concise mathematical definitions...
    
-   
+| proc | expression         |
+|------+--------------------|
+| f    | 2n                 |
+| g    | 2^n                |
+| h    | 2^2...^2 (n times) |
+  
+  
