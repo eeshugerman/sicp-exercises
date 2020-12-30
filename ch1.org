@@ -347,3 +347,27 @@ this is an iterative process
 | h    | 2^2...^2 (n times) |
   
   
+* excercise 1.11
+** recursive
+#+begin_src scheme
+  (define (f n)
+    (cond ((< n 3) n)
+          (else (+ (* 1 (f (- n 1)))
+                   (* 2 (f (- n 2)))
+                   (* 3 (f (- n 3)))))))
+#+end_src
+
+** iterative
+#+begin_src scheme
+  (define (f n)
+    (define (f-iter a b c count)
+      (cond ((= count n) a)
+            ((= count 0) (f-iter 1 0 0 (+ count 1)))
+            ((= count 1) (f-iter 2 1 0 (+ count 1)))
+            (else        (f-iter
+                          (+ (* 1 a) (* 2 b) (* 3 c))
+                          a
+                          b
+                          (+ count 1)))))
+    (f-iter 0 0 0 0))
+#+end_src
