@@ -338,11 +338,11 @@ this is an iterative process
   65536  ;; 2^16  
 #+end_src
 ** give concise mathematical definitions...
-| proc  | expression           |
+| proc | expression         |
 |------+--------------------|
 | f    | 2n                 |
-| g    | 2^idx                |
-| h    | 2^2...^2 (idx times) |
+| g    | 2^n                |
+| h    | 2^2...^2 (n times) |
   
 * excercise 1.11
 ** recursive
